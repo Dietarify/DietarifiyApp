@@ -8,7 +8,9 @@
       "@screens/*": ["screens/*"],
       "@components/*": ["components/*"],
       "@utils/*": ["utils/*"],
-      "@assets/*": ["assets/*"]
+      "@assets/*": ["assets/*"],
+      "@hooks/*": ["hooks/*"],
+      "@types/*": ["types/*"]
     }
   }
 }
