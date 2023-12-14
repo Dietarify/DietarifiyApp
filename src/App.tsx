@@ -1,19 +1,25 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import HomePage from "@screens/Home";
 import { registerRootComponent } from "expo";
+import routes from "./routes";
+import useAuth from "./hooks/auth";
 
 const Stack = createNativeStackNavigator();
 
-export function App() {
+function App() {
+  const [user, initialized] = useAuth();
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Home"
-          component={HomePage}
-        />
+      <Stack.Navigator initialRouteName="getting-started">
+        {routes.map((el) => (
+          <Stack.Screen
+            key={el.name}
+            options={el.options}
+            name={el.name}
+            component={el.component}
+          />
+        ))}
       </Stack.Navigator>
     </NavigationContainer>
   );

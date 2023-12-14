@@ -36,3 +36,8 @@ yarn-error.*
 
 # Android app
 *.apk
+
+# Firebase related
+.keystore/
+google-services.json
+credentials.json
