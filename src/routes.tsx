@@ -1,4 +1,5 @@
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import GettingStarted from "@screens/GettingStarted";
 import Home from "@screens/Home";
 
 interface RouteItem {
@@ -14,6 +15,11 @@ const routes: RouteItem[] = [
     },
     name: "home",
     component: Home,
+  },
+  {
+    options: { headerShown: false },
+    name: "getting-started",
+    component: GettingStarted,
   },
 ];
 

@@ -5,11 +5,23 @@ import { RootSiblingParent } from "react-native-root-siblings";
 import routes from "./routes";
 import useAuth from "./hooks/auth";
 import GettingStarted from "./screens/GettingStarted";
+import { useEffect } from "react";
+import loadCustomFonts from "./utils/fonts";
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   const { isInitializing, user } = useAuth();
+
+  useEffect(() => {
+    const loadFonts = async () => {
+      // Load additional custom fonts
+      await loadCustomFonts();
+    };
+
+    // Ensure that the fonts are loaded when the component mounts
+    loadFonts();
+  }, []);
 
   return !isInitializing && user != null ? (
     <RootSiblingParent>
