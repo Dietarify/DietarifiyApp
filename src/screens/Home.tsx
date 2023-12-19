@@ -7,6 +7,7 @@ import {
   Button,
   ScrollView,
   TouchableHighlight,
+  FlatList,
 } from "react-native";
 import useAuth from "@/hooks/auth";
 import http from "@/utils/http";
@@ -17,6 +18,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Dropdown } from "react-native-searchable-dropdown-kj";
 import DietHistoryCard from "@/components/global/DietHistoryCard";
+import { useNavigation } from "@react-navigation/native";
+
 async function getProfileName() {
   const { data } = await http.get("/profile");
 
@@ -24,6 +27,10 @@ async function getProfileName() {
 }
 
 export default function HomePage() {
+  const navigation = useNavigation();
+  const handleButtonClick = () => {
+    navigation.navigate("diet-history");
+  };
   const { user } = useAuth();
 
   useEffect(() => {
@@ -64,7 +71,10 @@ export default function HomePage() {
           <TouchableHighlight
             style={style.button}
             underlayColor={"#fff"}
-            // onPress={() => console.log("hello world")}
+            onPress={() => {
+              console.log("hello world");
+              handleButtonClick();
+            }}
           >
             <Text
               style={{
@@ -115,96 +125,205 @@ export default function HomePage() {
       </View>
 
       <View style={style.sectionContainer}>
-        <Text style={{ fontSize: 15 }}>Wednesday, 22nd November</Text>
-        <DietScheduleCard schedule="breakfast"></DietScheduleCard>
-        <DietScheduleCard schedule="lunch"></DietScheduleCard>
-        <DietScheduleCard schedule="dinner"></DietScheduleCard>
+        <Text
+          style={{
+            fontSize: 15,
+            alignSelf: "flex-start",
+            fontFamily: "Open-Sans",
+            fontWeight: "bold",
+            marginBottom: 10,
+          }}
+        >
+          Wednesday, 22nd November
+        </Text>
+        <DietScheduleCard
+          schedule="breakfast"
+          foodItem="Lontong Kari"
+        ></DietScheduleCard>
+        <DietScheduleCard
+          schedule="lunch"
+          foodItem="Baso Sapi"
+        ></DietScheduleCard>
+        <DietScheduleCard
+          schedule="dinner"
+          foodItem="Sate Ayam"
+        ></DietScheduleCard>
       </View>
 
       <View style={style.sectionContainer}>
-        <View>
-          <TouchableHighlight>
-            <Text>Check Dietary Menu</Text>
+        <View style={{ width: "100%" }}>
+          <TouchableHighlight style={[style.button, { alignSelf: "flex-end" }]}>
+            <Text
+              style={{
+                color: "#FFF",
+                fontSize: 10,
+                fontFamily: "Open-Sans",
+                fontWeight: "bold",
+              }}
+            >
+              Check Dietary Menu
+            </Text>
           </TouchableHighlight>
         </View>
-        <Text>It's Already Breakfast Time!</Text>
-        <Text>Have you eat Fried Rice?</Text>
-        <Text>it will gain you 500 kcal</Text>
-        <View style={{ flexDirection: "row" }}>
-          <View>
+        <Text
+          style={{
+            alignSelf: "flex-start",
+            fontFamily: "Open-Sans",
+            fontWeight: "bold",
+            marginBottom: 8,
+          }}
+        >
+          It's Already Breakfast Time!
+        </Text>
+        <Text
+          style={{
+            fontFamily: "Open-Sans",
+            fontWeight: "bold",
+            alignSelf: "flex-start",
+            marginBottom: 8,
+          }}
+        >
+          Have you eat Fried Rice?
+        </Text>
+        <Text
+          style={{
+            fontFamily: "Open-Sans",
+            // fontWeight: "bold",
+            alignSelf: "flex-start",
+            fontSize: 10,
+            marginBottom: 8,
+          }}
+        >
+          it will gain you 500 kcal
+        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+
+            justifyContent: "space-around",
+          }}
+        >
+          <View style={{ alignItems: "center" }}>
             <Ionicons
               name="checkmark-circle"
               size={40}
               color="#0bbaa6"
+              style={{
+                textAlign: "center",
+              }}
             ></Ionicons>
-            <Text>Yes!</Text>
+            <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>Yes!</Text>
           </View>
           <View>
-            <Ionicons name="ios-search" size={40} color="#000"></Ionicons>
-            <Text>I ate another food</Text>
+            <Ionicons
+              name="ios-search"
+              size={40}
+              color="#000"
+              style={{
+                textAlign: "center",
+              }}
+            ></Ionicons>
+            <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>
+              I ate another food
+            </Text>
           </View>
           <View>
             <MaterialIcons
               name="cancel"
               size={40}
               color={"#FC3A78"}
+              style={{
+                textAlign: "center",
+              }}
             ></MaterialIcons>
-            <Text>I skipped this meal</Text>
+            <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>
+              I skipped this meal
+            </Text>
           </View>
         </View>
-        <View style={style.sectionContainer}>
-          <Text>Check your food calories</Text>
+      </View>
 
-          <Dropdown
-            data={[1, 2, 3]}
-            labelField="Cari Makanan"
-            valueField="hahaa"
-            onChange={() => {}}
-          ></Dropdown>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <TouchableHighlight>
-              <Text>Check the Calories</Text>
-            </TouchableHighlight>
-            <TouchableHighlight>
-              <Text>i ate the food!</Text>
-            </TouchableHighlight>
-          </View>
+      <View style={style.sectionContainer}>
+        <Text
+          style={{
+            fontFamily: "Open-Sans",
+            fontWeight: "bold",
+            alignSelf: "flex-start",
+          }}
+        >
+          Check your food calories
+        </Text>
+
+        <Dropdown
+          data={["wow", "wow", , "woooooow"]}
+          labelField="Cari Makanan"
+          valueField="hahaa"
+          onChange={() => {}}
+        ></Dropdown>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <TouchableHighlight style={style.button}>
+            <Text
+              style={{ fontFamily: "Open-Sans", fontSize: 8, color: "white" }}
+            >
+              Check the Calories
+            </Text>
+          </TouchableHighlight>
+          <TouchableHighlight style={style.button}>
+            <Text
+              style={{ fontFamily: "Open-Sans", fontSize: 8, color: "white" }}
+            >
+              i ate the food!
+            </Text>
+          </TouchableHighlight>
         </View>
-        <View style={style.sectionContainer}>
-          <View
-            style={{
-              flexDirection: "row",
-              width: "100%",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text>Diet History</Text>
-            <TouchableHighlight>
-              <Text>Check Full History</Text>
-            </TouchableHighlight>
-          </View>
-          <DietHistoryCard
-            datetime={"a"}
-            foodname={"a"}
-            cal={100}
-          ></DietHistoryCard>
-          <DietHistoryCard
-            datetime={"a"}
-            foodname={"a"}
-            cal={100}
-          ></DietHistoryCard>
-          <DietHistoryCard
-            datetime={"a"}
-            foodname={"a"}
-            cal={100}
-          ></DietHistoryCard>
+      </View>
+      <View style={style.sectionContainer}>
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-between",
+            marginBottom: 10,
+          }}
+        >
+          <Text style={{ fontFamily: "Open-Sans", fontWeight: "bold" }}>
+            Diet History
+          </Text>
+          <TouchableHighlight style={style.button}>
+            <Text
+              style={{
+                fontFamily: "Open-Sans",
+                fontSize: 10,
+                color: "white",
+                fontWeight: "bold",
+              }}
+            >
+              Check Full History
+            </Text>
+          </TouchableHighlight>
         </View>
+        <DietHistoryCard
+          datetime={"a"}
+          foodname={"a"}
+          cal={100}
+        ></DietHistoryCard>
+        <DietHistoryCard
+          datetime={"a"}
+          foodname={"a"}
+          cal={100}
+        ></DietHistoryCard>
+        <DietHistoryCard
+          datetime={"a"}
+          foodname={"a"}
+          cal={100}
+        ></DietHistoryCard>
       </View>
 
       <Text>Hello, {user?.displayName}</Text>
@@ -252,7 +371,7 @@ const style = StyleSheet.create({
   },
   button: {
     borderRadius: 50,
-    backgroundColor: "#F89841",
+    backgroundColor: "#0BBAA6",
     justifyContent: "center",
     alignItems: "center",
     padding: 5,
