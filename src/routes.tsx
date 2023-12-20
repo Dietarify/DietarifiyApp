@@ -3,6 +3,7 @@ import GettingStarted from "@screens/GettingStarted";
 import Home from "@screens/Home";
 import Profile from "@screens/Profile";
 import DietHistory from "./screens/DietHistory";
+import ProfileEdit from "./screens/ProfileEdit";
 
 interface RouteItem {
   options: NativeStackNavigationOptions;
@@ -36,6 +37,13 @@ const routes: RouteItem[] = [
     },
     name: "diet-history",
     component: DietHistory,
+  },
+  {
+    options: {
+      headerShown: false,
+    },
+    name: "profile-edit",
+    component: ProfileEdit,
   },
 ];
 

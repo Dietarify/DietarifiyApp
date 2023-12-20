@@ -31,6 +31,9 @@ export default function HomePage() {
   const handleButtonClick = () => {
     navigation.navigate("diet-history");
   };
+  const handleButtonClick2 = () => {
+    navigation.navigate("profile");
+  };
   const { user } = useAuth();
 
   useEffect(() => {
@@ -152,7 +155,10 @@ export default function HomePage() {
 
       <View style={style.sectionContainer}>
         <View style={{ width: "100%" }}>
-          <TouchableHighlight style={[style.button, { alignSelf: "flex-end" }]}>
+          <TouchableHighlight
+            style={[style.button, { alignSelf: "flex-end" }]}
+            onPress={handleButtonClick2}
+          >
             <Text
               style={{
                 color: "#FFF",
