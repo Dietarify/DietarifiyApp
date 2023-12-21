@@ -26,7 +26,7 @@ function App() {
   return !isInitializing && user != null ? (
     <RootSiblingParent>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="home">
+        <Stack.Navigator initialRouteName="navigator">
           {routes.map((el) => (
             <Stack.Screen
               key={el.name}

@@ -13,17 +13,15 @@ import {
   Button as PaperButton,
   RadioButton as PaperRadioButton,
 } from "react-native-paper";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 
 export default function ProfileEdit() {
   const [nickName, setNickName] = useState("Azmi");
   const [gender, setGender] = useState("male");
   const [weight, setWeight] = useState("70");
   const [height, setHeight] = useState("175");
-  const [birthDate, setBirthDate] = useState(new Date("1990-01-01"));
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [birthDate, setBirthDate] = useState("1990-01-01");
+  // const [birthDate, setBirthDate] = useState(new Date("1990-01-01"));
+  // const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleSave = () => {
     // Implement your logic to send data to the API
@@ -36,15 +34,15 @@ export default function ProfileEdit() {
     });
   };
 
-  const handleDateChange = (
-    event: DateTimePickerEvent,
-    selectedDate?: Date
-  ) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setBirthDate(selectedDate);
-    }
-  };
+  // const handleDateChange = (
+  //   event: DateTimePickerEvent,
+  //   selectedDate?: Date
+  // ) => {
+  //   setShowDatePicker(false);
+  //   if (selectedDate) {
+  //     setBirthDate(selectedDate);
+  //   }
+  // };
   return (
     <KeyboardAvoidingView style={styles.container}>
       <ScrollView
@@ -90,10 +88,19 @@ export default function ProfileEdit() {
           />
           <PaperTextInput
             label="Birth Date"
-            value={birthDate.toISOString().split("T")[0]}
+            // value={birthDate.toISOString().split("T")[0]}
+            value={birthDate}
+            onChangeText={(text) => setBirthDate(text)}
             style={styles.input}
+            contentStyle={{
+              backgroundColor: "white",
+              fontFamily: "Open-Sans",
+              fontWeight: "bold",
+            }}
+            activeUnderlineColor="#0BBAA6"
+            underlineColor="#15DA97"
           />
-          <View style={styles.datePicker}>
+          {/* <View style={styles.datePicker}>
             <PaperButton onPress={() => setShowDatePicker(true)}>
               Select Date
             </PaperButton>
@@ -105,7 +112,7 @@ export default function ProfileEdit() {
                 onChange={handleDateChange}
               />
             )}
-          </View>
+          </View> */}
 
           <PaperTextInput
             label="Weight"

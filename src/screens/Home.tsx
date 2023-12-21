@@ -34,6 +34,9 @@ export default function HomePage() {
   const handleButtonClick2 = () => {
     navigation.navigate("profile");
   };
+  const handleButtonClick3 = () => {
+    navigation.navigate("goals");
+  };
   const { user } = useAuth();
 
   useEffect(() => {
@@ -302,7 +305,7 @@ export default function HomePage() {
           <Text style={{ fontFamily: "Open-Sans", fontWeight: "bold" }}>
             Diet History
           </Text>
-          <TouchableHighlight style={style.button}>
+          <TouchableHighlight style={style.button} onPress={handleButtonClick3}>
             <Text
               style={{
                 fontFamily: "Open-Sans",
