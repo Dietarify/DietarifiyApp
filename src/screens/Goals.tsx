@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -8,19 +8,40 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import CaloriesBurnCard from "@/components/global/CaloriesBurnCard";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Goals() {
+const Goals: React.FC = () => {
+  const navigation = useNavigation();
+  const handleEdit = () => {
+    navigation.navigate("goals-edit");
+  };
+  // Dummy data for FlatList
+  const data = [
+    {
+      id: "1",
+      date: "2023-01-01",
+      totalCaloriesBurned: 300,
+      totalCaloriesGained: 600,
+    },
+    {
+      id: "2",
+      date: "2023-01-02",
+      totalCaloriesBurned: 400,
+      totalCaloriesGained: 500,
+    },
+    // Add more data as needed
+  ];
+
   return (
-    <View style={style.container}>
-      <View style={style.sectionContainer}>
+    <View style={styles.container}>
+      <View style={styles.sectionContainer}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             width: "100%",
             marginBottom: 20,
-
-            //   justifyContent: "space-around",
           }}
         >
           <Image
@@ -29,178 +50,192 @@ export default function Goals() {
               uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU",
             }}
           ></Image>
-          <Text style={{ marginLeft: 10, fontFamily: "Open-Sans" }}>
-            Azmi Alfatih Shalahuddin
-          </Text>
-        </View>
-        <View style={style.goalContainer}>
-          <View
-            style={{
-              width: 50,
-              height: 50,
-              backgroundColor: "white",
-              borderRadius: 100,
-            }}
-          ></View>
-          <View>
+          <View style={{ width: "100%" }}>
             <Text
               style={{
+                marginLeft: 10,
                 fontFamily: "Open-Sans",
-                fontSize: 10,
-                color: "#F89841",
-              }}
-            >
-              You're going to reach your goal by
-            </Text>
-            <Text
-              style={{
-                fontFamily: "Open-Sans",
-                fontSize: 12,
-                color: "#F89841",
                 fontWeight: "bold",
+                fontSize: 16,
               }}
+              ellipsizeMode="tail"
             >
-              20th December 2023
+              Azmi Alfatih Shalahuddin
             </Text>
           </View>
-          <TouchableOpacity style={{ alignItems: "center" }}>
-            <Ionicons
-              name="md-pencil"
-              size={15}
-              style={{ color: "white" }}
-            ></Ionicons>
+        </View>
+        <View style={styles.goalContainer}>
+          <View>
+            <View style={{ flexDirection: "row" }}>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  fontWeight: "bold",
+                  color: "white",
+                  fontSize: 20,
+                }}
+              >
+                55
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  color: "white",
+                  fontSize: 10,
+                }}
+              >
+                {" "}
+                kg
+              </Text>
+            </View>
             <Text
               style={{
                 fontFamily: "Open-Sans",
-                fontSize: 10,
-                color: "white",
                 fontWeight: "bold",
+                color: "white",
+                fontSize: 10,
+              }}
+            >
+              Current Weight
+            </Text>
+          </View>
+
+          <View>
+            <View style={{ flexDirection: "row" }}>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  fontWeight: "bold",
+                  color: "white",
+                  fontSize: 20,
+                }}
+              >
+                55
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  color: "white",
+                  fontSize: 10,
+                }}
+              >
+                {" "}
+                kg
+              </Text>
+            </View>
+            <Text
+              style={{
+                fontFamily: "Open-Sans",
+                fontWeight: "bold",
+                color: "white",
+                fontSize: 10,
+              }}
+            >
+              Current Weight
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleEdit}>
+            <Ionicons name="pencil" size={18} color={"white"}></Ionicons>
+            <Text
+              style={{
+                color: "white",
+                fontFamily: "Open-Sans",
+                fontWeight: "bold",
+                fontSize: 10,
               }}
             >
               Update Goal
             </Text>
           </TouchableOpacity>
         </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            width: "100%",
-            // backgroundColor: "#F6F7F7",
-          }}
-        >
-          <View>
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-              <Text
-                style={{
-                  fontFamily: "Open-Sans",
-                  fontSize: 24,
-                  fontWeight: "bold",
-                }}
-              >
-                55
-              </Text>
-              <Text>kg</Text>
-            </View>
-            <Text
-              style={{
-                fontFamily: "Open-Sans",
-                fontWeight: "bold",
-                fontSize: 12,
-              }}
-            >
-              Current Weight
-            </Text>
-          </View>
-          <View>
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-              <Text
-                style={{
-                  fontFamily: "Open-Sans",
-                  fontSize: 24,
-                  fontWeight: "bold",
-                }}
-              >
-                65
-              </Text>
-              <Text>kg</Text>
-            </View>
-            <Text
-              style={{
-                fontFamily: "Open-Sans",
-                fontWeight: "bold",
-                fontSize: 12,
-              }}
-            >
-              Goal Weight
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View style={style.sectionContainer}>
-        <View
-          style={{
-            width: "100%",
-            alignItems: "flex-start",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
+        <View style={{ width: "100%", marginBottom: 10 }}>
           <Text
             style={{
               fontFamily: "Open-Sans",
-              fontSize: 18,
-              color: "#0A1936",
               fontWeight: "bold",
+              fontSize: 16,
             }}
           >
-            Weight Progress
+            Entries
           </Text>
-          <TouchableOpacity style={style.button}>
-            <Text
-              style={{
-                color: "white",
-                fontFamily: "Open-Sans",
-                fontWeight: "bold",
-              }}
-            >
-              View Detail
-            </Text>
-          </TouchableOpacity>
         </View>
-      </View>
-      <View style={style.sectionContainer}>
-        <Text
+
+        <View style={{ width: "100%", marginBottom: 10 }}>
+          <FlatList
+            // style={{ width: "100%" }}
+            data={data}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <CaloriesBurnCard
+                date={item.date}
+                totalCaloriesBurned={item.totalCaloriesBurned}
+                totalCaloriesGained={item.totalCaloriesGained}
+              />
+            )}
+          />
+        </View>
+        <View style={{ width: "100%", marginBottom: 10 }}>
+          <Text
+            style={{
+              fontFamily: "Open-Sans",
+              fontWeight: "bold",
+              fontSize: 16,
+            }}
+          >
+            Body Mass Index
+          </Text>
+        </View>
+        <View
           style={{
-            fontFamily: "Open-Sans",
-            fontSize: 18,
-            color: "#0A1936",
-            fontWeight: "bold",
+            width: "100%",
+            backgroundColor: "#F6F7F7",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          Calories
-        </Text>
-      </View>
-      <View style={style.sectionContainer}>
-        <Text
-          style={{
-            fontFamily: "Open-Sans",
-            fontSize: 18,
-            color: "#0A1936",
-            fontWeight: "bold",
-          }}
-        >
-          Body Mass Index
-        </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Ionicons name="calculator" size={40} color="#0A1936"></Ionicons>
+            <View style={{ marginLeft: 10 }}>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  fontWeight: "bold",
+                  fontSize: 16,
+                }}
+              >
+                BMI Score
+              </Text>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  // fontWeight: "bold",
+                  fontSize: 12,
+                }}
+              >
+                Normal
+              </Text>
+            </View>
+          </View>
+          <Text
+            style={{
+              fontFamily: "Open-Sans",
+              fontWeight: "bold",
+              fontSize: 28,
+            }}
+          >
+            21.2
+          </Text>
+        </View>
       </View>
     </View>
   );
-}
+};
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     backgroundColor: "#EAEFF2",
-    paddingTop: 80,
+    paddingTop: 52,
     paddingBottom: 52,
     paddingHorizontal: "5%",
     flex: 1,
@@ -233,12 +268,14 @@ const style = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-around",
     paddingHorizontal: "5%",
-    marginBottom: 15,
+    marginBottom: 20,
   },
   button: {
-    backgroundColor: "#F89841",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    alignItems: "center",
   },
 });
+
+export default Goals;

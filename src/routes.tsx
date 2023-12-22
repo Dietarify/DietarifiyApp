@@ -6,6 +6,7 @@ import DietHistory from "./screens/DietHistory";
 import ProfileEdit from "./screens/ProfileEdit";
 import Goals from "./screens/Goals";
 import Navigator from "./Navigator";
+import GoalsEdit from "./screens/GoalsEdit";
 
 interface RouteItem {
   options: NativeStackNavigationOptions;
@@ -60,6 +61,13 @@ const routes: RouteItem[] = [
     },
     name: "navigator",
     component: Navigator,
+  },
+  {
+    options: {
+      headerShown: false,
+    },
+    name: "goals-edit",
+    component: GoalsEdit,
   },
 ];
 

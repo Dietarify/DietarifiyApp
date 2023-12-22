@@ -1,4 +1,4 @@
-import React, { useEffect, Component, Fragment } from "react";
+import React, { useEffect, Component, Fragment, useState } from "react";
 import auth from "@react-native-firebase/auth";
 import {
   StyleSheet,
@@ -20,29 +20,79 @@ import { Dropdown } from "react-native-searchable-dropdown-kj";
 import DietHistoryCard from "@/components/global/DietHistoryCard";
 import { useNavigation } from "@react-navigation/native";
 
-async function getProfileName() {
-  const { data } = await http.get("/profile");
+interface FoodData {
+  status: string;
+  message: string;
+  data: {
+    foods: Food[];
+    metadata: {
+      limit: number;
+      page: number;
+      totalPage: number;
+      totalItem: number;
+    };
+  };
+}
 
-  return data.data.name;
+interface Food {
+  id: number;
+  name: string;
+  category: string;
+  caloriesPerHundredGram: number;
+  energyPerHundredGram: number;
 }
 
 export default function HomePage() {
   const navigation = useNavigation();
-  const handleButtonClick = () => {
+  const DietHistoryButton = () => {
     navigation.navigate("diet-history");
   };
-  const handleButtonClick2 = () => {
-    navigation.navigate("profile");
-  };
-  const handleButtonClick3 = () => {
-    navigation.navigate("goals");
-  };
-  const { user } = useAuth();
+
+  const [value, setValue] = useState();
+  const [foodList, setFoodList] = useState<Food[]>([]);
+  const [isFocusDropDown, setIsFocusDropDown] = useState(false);
+
+  // Removed unused components and imports
+
+  async function getFoodList() {
+    try {
+      // Updated the destructure to match the actual response structure
+      const { data } = await http.get("/foods?limit=150");
+
+      // Check if the response status is 'success' before accessing data
+      if (data.status === "success") {
+        return data.data.foods;
+      } else {
+        // Handle the case where the response status is not 'success'
+        console.error("Failed to fetch food list");
+        return [];
+      }
+    } catch (error) {
+      // Handle any network or server errors
+      console.error("Error fetching food list:", error);
+      return [];
+    }
+  }
 
   useEffect(() => {
     async function run() {
-      const nama = await getProfileName();
-      Toast.show(`Halo, ${nama}`);
+      try {
+        const foodList = await getFoodList();
+        setFoodList(foodList);
+
+        // Displaying information for each food in the console
+        // foodList.forEach((food: Food) => {
+        //   console.log(`Food Name: ${food.name}`);
+        //   console.log(`Category: ${food.category}`);
+        //   console.log(`Calories per 100g: ${food.caloriesPerHundredGram}`);
+        //   console.log(`Energy per 100g: ${food.energyPerHundredGram}`);
+        //   console.log("------------------------");
+        // });
+        console.log(foodList);
+      } catch (error) {
+        // Handle any errors that might occur during the execution
+        console.error("Error in run function:", error);
+      }
     }
 
     run();
@@ -74,25 +124,6 @@ export default function HomePage() {
               Hi, Azmi!
             </Text>
           </View>
-          <TouchableHighlight
-            style={style.button}
-            underlayColor={"#fff"}
-            onPress={() => {
-              console.log("hello world");
-              handleButtonClick();
-            }}
-          >
-            <Text
-              style={{
-                color: "#FFF",
-                fontSize: 10,
-                fontFamily: "Open-Sans",
-                fontWeight: "bold",
-              }}
-            >
-              Check My Goals
-            </Text>
-          </TouchableHighlight>
         </View>
         <View>
           <Text
@@ -157,23 +188,7 @@ export default function HomePage() {
       </View>
 
       <View style={style.sectionContainer}>
-        <View style={{ width: "100%" }}>
-          <TouchableHighlight
-            style={[style.button, { alignSelf: "flex-end" }]}
-            onPress={handleButtonClick2}
-          >
-            <Text
-              style={{
-                color: "#FFF",
-                fontSize: 10,
-                fontFamily: "Open-Sans",
-                fontWeight: "bold",
-              }}
-            >
-              Check Dietary Menu
-            </Text>
-          </TouchableHighlight>
-        </View>
+        <View style={{ width: "100%" }}></View>
         <Text
           style={{
             alignSelf: "flex-start",
@@ -265,10 +280,42 @@ export default function HomePage() {
         </Text>
 
         <Dropdown
-          data={["wow", "wow", , "woooooow"]}
-          labelField="Cari Makanan"
-          valueField="hahaa"
-          onChange={() => {}}
+          onFocus={() => setIsFocusDropDown(true)}
+          onBlur={() => setIsFocusDropDown(false)}
+          data={foodList}
+          value={value}
+          labelField="name"
+          search
+          valueField="id"
+          onChange={(item) => {
+            setValue(item.value);
+            // setIsFocus(false);
+          }}
+          selectedTextStyle={{
+            width: "100%",
+            fontSize: 12,
+            fontWeight: "bold",
+            fontFamily: "Open-Sans",
+          }}
+          containerStyle={{
+            width: "100%",
+          }}
+          placeholderStyle={{
+            width: "100%",
+            fontSize: 12,
+            fontWeight: "bold",
+            fontFamily: "Open-Sans",
+          }}
+          style={{ width: "100%" }}
+          maxHeight={300}
+          placeholder={!isFocusDropDown ? "Select Food" : "..."}
+          inputSearchStyle={{
+            width: "100%",
+            fontSize: 12,
+            fontWeight: "bold",
+            fontFamily: "Open-Sans",
+          }}
+          searchPlaceholder="Type your food name..."
         ></Dropdown>
         <View
           style={{
@@ -293,7 +340,7 @@ export default function HomePage() {
           </TouchableHighlight>
         </View>
       </View>
-      <View style={style.sectionContainer}>
+      <View style={[style.sectionContainer, { marginBottom: 80 }]}>
         <View
           style={{
             flexDirection: "row",
@@ -305,7 +352,7 @@ export default function HomePage() {
           <Text style={{ fontFamily: "Open-Sans", fontWeight: "bold" }}>
             Diet History
           </Text>
-          <TouchableHighlight style={style.button} onPress={handleButtonClick3}>
+          <TouchableHighlight style={style.button} onPress={DietHistoryButton}>
             <Text
               style={{
                 fontFamily: "Open-Sans",
@@ -335,7 +382,7 @@ export default function HomePage() {
         ></DietHistoryCard>
       </View>
 
-      <Text>Hello, {user?.displayName}</Text>
+      {/* <Text>Hello, {user?.displayName}</Text>
       <Text>Your email is {user?.email}</Text>
 
       <Button
@@ -343,7 +390,7 @@ export default function HomePage() {
         onPress={async () => {
           await auth().signOut();
         }}
-      ></Button>
+      ></Button> */}
     </ScrollView>
   );
 }
@@ -353,6 +400,7 @@ const style = StyleSheet.create({
     flex: 1,
     paddingTop: 52,
     paddingBottom: 52,
+    // marginBottom: 52,
     backgroundColor: "#eaeff2",
     // alignItems: "center",
     // paddingHorizontal: ,
