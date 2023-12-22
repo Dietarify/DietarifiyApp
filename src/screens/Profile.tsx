@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,13 +9,51 @@ import {
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FoodPreferenceCard from "@/components/global/FoodPreferenceCard";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import http from "@/utils/http";
+import Toast from "react-native-root-toast";
+
+interface Profile {
+  weightTarget?: number;
+  currentWeight?: number;
+  height?: number;
+  nickname?: string;
+  birthday?: Date;
+  gender?: "Male" | "Female";
+  startWeight?: number;
+  email: string;
+  name: string;
+  picture: string;
+}
 
 export default function Profile() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const isFocused = useIsFocused();
+
   const navigation = useNavigation();
   const handleButtonClick = () => {
     navigation.navigate("profile-edit");
   };
+
+  async function getProfile() {
+    try {
+      const result = await http.get("/profile");
+      const profile = result.data.data;
+
+      console.log(profile);
+
+      setProfile({
+        ...profile,
+        birthday: profile.birthDate ? new Date(profile.birthDate) : undefined,
+      });
+    } catch (err) {
+      Toast.show("failed to fetch profile");
+    }
+  }
+
+  useEffect(() => {
+    getProfile();
+  }, [isFocused]);
 
   return (
     <ScrollView
@@ -33,7 +71,9 @@ export default function Profile() {
         >
           <Image
             source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU",
+              uri:
+                profile?.picture ??
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU",
             }}
             style={{ width: "25%", aspectRatio: 1, borderRadius: 100 }}
           ></Image>
@@ -47,7 +87,7 @@ export default function Profile() {
                 marginBottom: 10,
               }}
             >
-              Azmi Alfatih Shalahuddin
+              {profile?.name ?? ""}
             </Text>
             <TouchableOpacity onPress={handleButtonClick}>
               <View
@@ -78,19 +118,25 @@ export default function Profile() {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialCommunityIcons name="calendar"></MaterialCommunityIcons>
             <Text style={{ fontFamily: "Open-Sans", fontSize: 12 }}>
-              April 15th, 2002
+              {profile?.birthday?.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "2-digit",
+              }) ?? "Not set"}
             </Text>
           </View>
           <View style={style.verticalLine}></View>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialCommunityIcons name="gender-male-female"></MaterialCommunityIcons>
-            <Text style={{ fontFamily: "Open-Sans", fontSize: 12 }}>Male</Text>
+            <Text style={{ fontFamily: "Open-Sans", fontSize: 12 }}>
+              {profile?.gender ?? "Not set"}
+            </Text>
           </View>
           <View style={style.verticalLine}></View>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialCommunityIcons name="human-male-height"></MaterialCommunityIcons>
             <Text style={{ fontFamily: "Open-Sans", fontSize: 12 }}>
-              162 cm
+              {profile?.height ?? "Not set"}
             </Text>
           </View>
         </View>
@@ -106,21 +152,29 @@ export default function Profile() {
           >
             Current User Weight
           </Text>
-          <View style={style.weightDisplay}>
-            <Text style={{ fontFamily: "Open-Sans", fontSize: 20 }}>72.5</Text>
-            <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>kg</Text>
-          </View>
-          <TouchableOpacity
-            style={{ alignSelf: "flex-end", flexDirection: "row" }}
-          >
-            <MaterialCommunityIcons name="pencil"></MaterialCommunityIcons>
-            <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>
-              Update Weight
-            </Text>
-          </TouchableOpacity>
+          {profile?.currentWeight ? (
+            <View style={style.weightDisplay}>
+              <Text style={{ fontFamily: "Open-Sans", fontSize: 20 }}>
+                {profile.currentWeight}
+              </Text>
+              <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>kg</Text>
+            </View>
+          ) : (
+            <View style={{ padding: 30 }}>
+              <Text
+                style={{
+                  fontFamily: "Open-Sans",
+                  fontSize: 20,
+                  textAlign: "center",
+                }}
+              >
+                Not set
+              </Text>
+            </View>
+          )}
         </View>
       </View>
-      <View style={style.sectionContainer}>
+      {/* <View style={style.sectionContainer}>
         <View style={{ width: "100%", marginBottom: 10 }}>
           <Text
             style={{
@@ -145,7 +199,7 @@ export default function Profile() {
           type="allergies"
           foodlist={[1, 2]}
         ></FoodPreferenceCard>
-      </View>
+      </View> */}
     </ScrollView>
   );
 }

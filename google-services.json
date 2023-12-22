@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "640387379525",
+    "project_id": "dietarify",
+    "storage_bucket": "dietarify.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:640387379525:android:f78c091c1af1a71e81ce2c",
+        "android_client_info": {
+          "package_name": "com.dietarify.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "640387379525-jtmt2icn4nd2k4om8ie8b8rgiorjogdq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dietarify.app",
+            "certificate_hash": "4daa12d6cc1d6a36d7a6c91c62e7193426cf2a82"
+          }
+        },
+        {
+          "client_id": "640387379525-mb673sojrj4b075iadmiqanvmtsqtdo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRY1j1J_Ins2UzECjTJcSQNndHMZNe2vQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "640387379525-mb673sojrj4b075iadmiqanvmtsqtdo9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

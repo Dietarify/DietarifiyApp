@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import http from "@/utils/http";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,25 +14,64 @@ import {
   Button as PaperButton,
   RadioButton as PaperRadioButton,
 } from "react-native-paper";
+import Toast from "react-native-root-toast";
+
+interface Profile {
+  currentWeight?: string;
+  height?: string;
+  nickname?: string;
+  birthDate?: string;
+  gender?: string;
+  email?: string;
+  name?: string;
+  picture?: string;
+}
 
 export default function ProfileEdit() {
-  const [nickName, setNickName] = useState("Azmi");
-  const [gender, setGender] = useState("male");
-  const [weight, setWeight] = useState("70");
-  const [height, setHeight] = useState("175");
-  const [birthDate, setBirthDate] = useState("1990-01-01");
-  // const [birthDate, setBirthDate] = useState(new Date("1990-01-01"));
-  // const [showDatePicker, setShowDatePicker] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
 
-  const handleSave = () => {
+  async function getProfile() {
+    try {
+      const result = await http.get("/profile");
+      const profile = result.data.data;
+
+      const stateProfile = {
+        ...profile,
+        birthDate: profile.birthDate,
+        currentWeight: profile.currentWeight.toString(),
+        height: profile.height.toString(),
+      };
+
+      console.log(stateProfile);
+
+      setProfile(stateProfile);
+    } catch (err) {
+      Toast.show("failed to fetch profile");
+    }
+  }
+
+  useEffect(() => {
+    getProfile();
+  }, []);
+
+  const handleSave = async () => {
     // Implement your logic to send data to the API
-    console.log("Data to be sent:", {
-      nickName,
-      birthDate,
-      gender,
-      weight,
-      height,
-    });
+    try {
+      const dataToSend = {
+        currentWeight: Number(profile?.currentWeight ?? undefined),
+        height: Number(profile?.height ?? undefined),
+        nickname: profile?.nickname ?? undefined,
+        birthDate: profile?.birthDate
+          ? new Date(profile?.birthDate).toISOString()
+          : undefined,
+        gender: profile?.gender,
+      };
+
+      await http.patch("/profile", dataToSend);
+      Toast.show("Profile Updated");
+    } catch (err) {
+      Toast.show("Failed to Update Profile");
+    }
   };
 
   // const handleDateChange = (
@@ -65,7 +105,9 @@ export default function ProfileEdit() {
         <View style={styles.photoContainer}>
           <Image
             source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU",
+              uri:
+                profile?.picture ??
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU",
             }}
             style={{ width: 120, aspectRatio: 1, borderRadius: 100 }}
           />
@@ -75,8 +117,13 @@ export default function ProfileEdit() {
           <PaperTextInput
             // mode="flat"
             label="Nick Name"
-            value={nickName}
-            onChangeText={(text) => setNickName(text)}
+            value={profile?.nickname}
+            onChangeText={(text) =>
+              setProfile({
+                ...(profile ?? {}),
+                nickname: text,
+              })
+            }
             style={styles.input}
             contentStyle={{
               backgroundColor: "white",
@@ -89,8 +136,13 @@ export default function ProfileEdit() {
           <PaperTextInput
             label="Birth Date"
             // value={birthDate.toISOString().split("T")[0]}
-            value={birthDate}
-            onChangeText={(text) => setBirthDate(text)}
+            value={profile?.birthDate}
+            onChangeText={(text) =>
+              setProfile({
+                ...(profile ?? {}),
+                birthDate: text,
+              })
+            }
             style={styles.input}
             contentStyle={{
               backgroundColor: "white",
@@ -116,8 +168,13 @@ export default function ProfileEdit() {
 
           <PaperTextInput
             label="Weight"
-            value={weight}
-            onChangeText={(text) => setWeight(text)}
+            value={profile?.currentWeight}
+            onChangeText={(text) =>
+              setProfile({
+                ...(profile ?? {}),
+                currentWeight: text,
+              })
+            }
             style={styles.input}
             keyboardType="numeric"
             contentStyle={{
@@ -130,8 +187,13 @@ export default function ProfileEdit() {
           />
           <PaperTextInput
             label="Height"
-            value={height}
-            onChangeText={(text) => setHeight(text)}
+            value={profile?.height?.toString()}
+            onChangeText={(text) =>
+              setProfile({
+                ...(profile ?? {}),
+                height: text,
+              })
+            }
             style={styles.input}
             keyboardType="numeric"
             contentStyle={{
@@ -152,13 +214,18 @@ export default function ProfileEdit() {
             Gender
           </Text>
           <PaperRadioButton.Group
-            onValueChange={(value) => setGender(value)}
-            value={gender}
+            onValueChange={(value) =>
+              setProfile({
+                ...(profile ?? {}),
+                gender: value,
+              })
+            }
+            value={profile?.gender ?? ""}
           >
             <View style={styles.radioGroup}>
               <PaperRadioButton.Item
                 label="Male"
-                value="male"
+                value="Male"
                 labelStyle={{
                   fontFamily: "Open-Sans",
                   fontSize: 14,
@@ -169,7 +236,7 @@ export default function ProfileEdit() {
               />
               <PaperRadioButton.Item
                 label="Female"
-                value="female"
+                value="Female"
                 labelStyle={{
                   fontFamily: "Open-Sans",
                   fontSize: 14,
