@@ -2,13 +2,15 @@ import React from "react";
 import { StyleSheet, View, Text } from "react-native";
 
 export interface CardPropsType {
-  datetime: String;
+  date: String;
+  time: String;
   foodname: String;
-  cal: Number;
+  cal: number;
 }
 
 const DietHistoryCard: React.FC<CardPropsType> = ({
-  datetime,
+  date,
+  time,
   foodname,
   cal,
 }) => {
@@ -20,7 +22,7 @@ const DietHistoryCard: React.FC<CardPropsType> = ({
           fontSize: 12,
         }}
       >
-        10 Nov 2023
+        {date}
       </Text>
       <Text
         style={{
@@ -28,7 +30,7 @@ const DietHistoryCard: React.FC<CardPropsType> = ({
           fontSize: 12,
         }}
       >
-        18.30
+        {time}
       </Text>
       <Text
         style={{
@@ -36,7 +38,7 @@ const DietHistoryCard: React.FC<CardPropsType> = ({
           fontSize: 12,
         }}
       >
-        Fried Chicken
+        {foodname}
       </Text>
       <Text
         style={{
@@ -44,7 +46,7 @@ const DietHistoryCard: React.FC<CardPropsType> = ({
           fontSize: 12,
         }}
       >
-        300kcal
+        {cal}
       </Text>
     </View>
   );
@@ -55,7 +57,7 @@ const style = StyleSheet.create({
     width: "100%",
     height: 41,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
     backgroundColor: "white",
     shadowColor: "#000",

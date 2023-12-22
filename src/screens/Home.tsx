@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableHighlight,
   FlatList,
+  TextInput,
 } from "react-native";
 import useAuth from "@/hooks/auth";
 import http from "@/utils/http";
@@ -20,39 +21,46 @@ import { Dropdown } from "react-native-searchable-dropdown-kj";
 import DietHistoryCard from "@/components/global/DietHistoryCard";
 import { useNavigation } from "@react-navigation/native";
 
-interface FoodData {
-  status: string;
-  message: string;
-  data: {
-    foods: Food[];
-    metadata: {
-      limit: number;
-      page: number;
-      totalPage: number;
-      totalItem: number;
-    };
-  };
-}
-
-interface Food {
-  id: number;
-  name: string;
-  category: string;
-  caloriesPerHundredGram: number;
-  energyPerHundredGram: number;
-}
-
+//Navigation
 export default function HomePage() {
   const navigation = useNavigation();
   const DietHistoryButton = () => {
     navigation.navigate("diet-history");
   };
 
+  // Eat Food
   const [value, setValue] = useState();
+  const [foodWeight, setFoodWeight] = useState(0);
+  const foodEatenData = {
+    foodId: value,
+    foodItemWeight: foodWeight,
+  };
+  async function handleEatFood() {
+    try {
+      console.log(foodEatenData);
+      await http.post("/diet", foodEatenData).then((response) => {
+        // Handle the success response
+        if (response.data.status == "success") {
+          Toast.show("Your diet has been recorded!");
+        }
+        console.log("Response:", response.data);
+      });
+    } catch (error) {
+      console.error("error eat food : ", error);
+    }
+  }
+
+  //Food List
+  interface Food {
+    id: number;
+    name: string;
+    category: string;
+    caloriesPerHundredGram: number;
+    energyPerHundredGram: number;
+  }
+
   const [foodList, setFoodList] = useState<Food[]>([]);
   const [isFocusDropDown, setIsFocusDropDown] = useState(false);
-
-  // Removed unused components and imports
 
   async function getFoodList() {
     try {
@@ -88,7 +96,7 @@ export default function HomePage() {
         //   console.log(`Energy per 100g: ${food.energyPerHundredGram}`);
         //   console.log("------------------------");
         // });
-        console.log(foodList);
+        // console.log(foodList);
       } catch (error) {
         // Handle any errors that might occur during the execution
         console.error("Error in run function:", error);
@@ -97,6 +105,53 @@ export default function HomePage() {
 
     run();
   }, []);
+
+  //Diet History
+  interface HistoryItem {
+    timestamp: string;
+    userId: string;
+    eatenFoodId: number;
+    quantity: number;
+    eatenFood: {
+      id: number;
+      name: string;
+      category: string;
+      caloriesPerHundredGram: number;
+      energyPerHundredGram: number;
+    };
+  }
+
+  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    async function fetchHistoryData() {
+      try {
+        const response = await http.get("/diet?limit=3&page=1"); // Replace with your API endpoint
+        setHistoryData(response.data.data);
+        console.log("history data", historyData);
+      } catch (error) {
+        console.error("Error fetching history data:", error);
+      }
+    }
+
+    fetchHistoryData();
+  }, []);
+
+  const renderHistoryCard = ({ item }: { item: HistoryItem }) => {
+    const CaloriesCount =
+      (item.quantity * item.eatenFood.caloriesPerHundredGram) / 100;
+
+    return (
+      <DietHistoryCard
+        // date={"aaa"}
+        // time={"aaa"}
+        date={new Date(item.timestamp).toDateString()}
+        time={new Date(item.timestamp).toTimeString().slice(0, 8)}
+        foodname={item.eatenFood.name}
+        cal={CaloriesCount}
+      />
+    );
+  };
 
   return (
     <ScrollView
@@ -288,8 +343,8 @@ export default function HomePage() {
           search
           valueField="id"
           onChange={(item) => {
-            setValue(item.value);
-            // setIsFocus(false);
+            setValue(item.id);
+            console.log("berubah!, value : ", value);
           }}
           selectedTextStyle={{
             width: "100%",
@@ -306,7 +361,7 @@ export default function HomePage() {
             fontWeight: "bold",
             fontFamily: "Open-Sans",
           }}
-          style={{ width: "100%" }}
+          style={{ width: "100%", marginBottom: 5 }}
           maxHeight={300}
           placeholder={!isFocusDropDown ? "Select Food" : "..."}
           inputSearchStyle={{
@@ -322,16 +377,37 @@ export default function HomePage() {
             flexDirection: "row",
             justifyContent: "space-between",
             width: "100%",
+            height: 25,
           }}
         >
-          <TouchableHighlight style={style.button}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text
-              style={{ fontFamily: "Open-Sans", fontSize: 8, color: "white" }}
+              style={{
+                fontFamily: "Open-Sans",
+                fontSize: 12,
+                fontWeight: "bold",
+              }}
             >
-              Check the Calories
+              Input Food Weight in gram :
             </Text>
-          </TouchableHighlight>
-          <TouchableHighlight style={style.button}>
+            <TextInput
+              keyboardType="numeric"
+              style={{
+                borderColor: "gray",
+                fontFamily: "Open-Sans",
+                fontSize: 12,
+                fontWeight: "bold",
+                marginLeft: 5,
+              }}
+              // value={foodWeight.toString()}
+              placeholder="..."
+              onChangeText={(input) => setFoodWeight(parseInt(input, 10) || 0)}
+            />
+          </View>
+          <TouchableHighlight
+            style={style.button}
+            onPress={() => handleEatFood()}
+          >
             <Text
               style={{ fontFamily: "Open-Sans", fontSize: 8, color: "white" }}
             >
@@ -365,21 +441,12 @@ export default function HomePage() {
             </Text>
           </TouchableHighlight>
         </View>
-        <DietHistoryCard
-          datetime={"a"}
-          foodname={"a"}
-          cal={100}
-        ></DietHistoryCard>
-        <DietHistoryCard
-          datetime={"a"}
-          foodname={"a"}
-          cal={100}
-        ></DietHistoryCard>
-        <DietHistoryCard
-          datetime={"a"}
-          foodname={"a"}
-          cal={100}
-        ></DietHistoryCard>
+        <FlatList
+          data={historyData}
+          // keyExtractor={(item) => item.timestamp}
+          renderItem={renderHistoryCard}
+          scrollEnabled={false}
+        />
       </View>
 
       {/* <Text>Hello, {user?.displayName}</Text>
@@ -403,14 +470,14 @@ const style = StyleSheet.create({
     // marginBottom: 52,
     backgroundColor: "#eaeff2",
     // alignItems: "center",
-    // paddingHorizontal: ,
+    paddingHorizontal: "5%",
     // justifyContent: "center",
   },
   sectionContainer: {
     backgroundColor: "#fff",
     alignItems: "center",
     flexWrap: "wrap",
-    width: "90%",
+    width: "100%",
     alignContent: "center",
     paddingHorizontal: 15,
     paddingVertical: 10,
