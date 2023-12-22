@@ -11,7 +11,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import CaloriesBurnCard from "@/components/global/CaloriesBurnCard";
 import { useNavigation } from "@react-navigation/native";
 import http from "@/utils/http";
-import { setStatusBarHidden } from "expo-status-bar";
 
 const Goals: React.FC = () => {
   const navigation = useNavigation();
@@ -38,12 +37,22 @@ const Goals: React.FC = () => {
         // console.log("response", response.data.data);
         setBmi(response.data.data.bmi);
       } catch (error) {
-        console.error("Error fetching goals data:", error);
+        console.error("Error fetching BMI data:", error);
+      }
+    }
+
+    async function fetchCalories() {
+      try {
+        const response = await http.get("history/calories?limit=3&page=1");
+        setCaloriesHistory(response.data.data);
+      } catch (error) {
+        console.error("Error fetching calories data : ", error);
       }
     }
 
     fetchGoals();
     fetchBMI();
+    fetchCalories();
   }, []);
   // Dummy data for FlatList
   const data = [
@@ -90,6 +99,27 @@ const Goals: React.FC = () => {
   });
 
   const [bmi, setBmi] = useState<number>(0);
+  const calculateBMIStatus = (bmi: number): string => {
+    if (bmi < 18.5) {
+      return "Underweight";
+    } else if (bmi >= 18.5 && bmi < 24.9) {
+      return "Normal weight";
+    } else if (bmi >= 25 && bmi < 29.9) {
+      return "Overweight";
+    } else {
+      return "Obese";
+    }
+  };
+  const status = calculateBMIStatus(bmi);
+
+  interface caloriesHistory {
+    timestamp: string;
+    userId: string;
+    consumedCalories: number;
+    caloriesNeeds: number;
+  }
+
+  const [caloriesHistory, setCaloriesHistory] = useState<caloriesHistory[]>([]);
 
   return (
     <View style={styles.container}>
@@ -221,13 +251,15 @@ const Goals: React.FC = () => {
         <View style={{ width: "100%", marginBottom: 10 }}>
           <FlatList
             // style={{ width: "100%" }}
-            data={data}
-            keyExtractor={(item) => item.id}
+            data={caloriesHistory}
+            // keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <CaloriesBurnCard
-                date={item.date}
-                totalCaloriesBurned={item.totalCaloriesBurned}
-                totalCaloriesGained={item.totalCaloriesGained}
+                date={new Date(item.timestamp).toLocaleDateString()}
+                totalCaloriesBurned={(
+                  item.caloriesNeeds - item.consumedCalories
+                ).toFixed(2)}
+                totalCaloriesGained={item.consumedCalories.toFixed(2)}
               />
             )}
           />
@@ -271,7 +303,7 @@ const Goals: React.FC = () => {
                   fontSize: 12,
                 }}
               >
-                Normal
+                {status}
               </Text>
             </View>
           </View>

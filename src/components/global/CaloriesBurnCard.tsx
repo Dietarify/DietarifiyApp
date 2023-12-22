@@ -5,8 +5,8 @@ import { View, Text, StyleSheet } from "react-native";
 // Define the CardProps type
 interface CardProps {
   date: string;
-  totalCaloriesGained: number;
-  totalCaloriesBurned: number;
+  totalCaloriesGained: string;
+  totalCaloriesBurned: string;
 }
 
 // Define the Card component
