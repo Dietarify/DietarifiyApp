@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,12 +10,41 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CaloriesBurnCard from "@/components/global/CaloriesBurnCard";
 import { useNavigation } from "@react-navigation/native";
+import http from "@/utils/http";
+import { setStatusBarHidden } from "expo-status-bar";
 
 const Goals: React.FC = () => {
   const navigation = useNavigation();
   const handleEdit = () => {
     navigation.navigate("goals-edit");
   };
+
+  useEffect(() => {
+    async function fetchGoals() {
+      try {
+        const response = await http.get("/profile");
+        // Replace with your API endpoint
+        // console.log("response", response.data.data);
+        setUser(response.data.data);
+      } catch (error) {
+        console.error("Error fetching goals data:", error);
+      }
+    }
+
+    async function fetchBMI() {
+      try {
+        const response = await http.get("/profile/bmi");
+        // Replace with your API endpoint
+        // console.log("response", response.data.data);
+        setBmi(response.data.data.bmi);
+      } catch (error) {
+        console.error("Error fetching goals data:", error);
+      }
+    }
+
+    fetchGoals();
+    fetchBMI();
+  }, []);
   // Dummy data for FlatList
   const data = [
     {
@@ -46,11 +75,21 @@ const Goals: React.FC = () => {
     picture: string;
   }
 
-  // const [user, setUser] = useState<UserData>({
-  //   currentWeight : 0,
-  //   height : 0,
-  //   weightTarget,
-  // })
+  const [user, setUser] = useState<UserData>({
+    currentWeight: 0,
+    height: 0,
+    weightTarget: 0,
+    nickname: "Nick Name",
+    birthDate: "00-00-0000",
+    gender: "Male",
+    dateTarget: "0-00-0000",
+    email: "aa@gmail.com",
+    name: "Name",
+    picture:
+      '"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU"',
+  });
+
+  const [bmi, setBmi] = useState<number>(0);
 
   return (
     <View style={styles.container}>
@@ -66,10 +105,10 @@ const Goals: React.FC = () => {
           <Image
             style={{ width: 45, height: 45, borderRadius: 100 }}
             source={{
-              uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU",
+              uri: user.picture,
             }}
           ></Image>
-          <View style={{ width: "100%" }}>
+          <View style={{ width: "90 %" }}>
             <Text
               style={{
                 marginLeft: 10,
@@ -79,7 +118,7 @@ const Goals: React.FC = () => {
               }}
               ellipsizeMode="tail"
             >
-              Azmi Alfatih Shalahuddin
+              {user.name}
             </Text>
           </View>
         </View>
@@ -94,7 +133,7 @@ const Goals: React.FC = () => {
                   fontSize: 20,
                 }}
               >
-                55
+                {user.currentWeight}
               </Text>
               <Text
                 style={{
@@ -129,7 +168,7 @@ const Goals: React.FC = () => {
                   fontSize: 20,
                 }}
               >
-                55
+                {user.weightTarget}
               </Text>
               <Text
                 style={{
@@ -150,7 +189,7 @@ const Goals: React.FC = () => {
                 fontSize: 10,
               }}
             >
-              Current Weight
+              Target Weight
             </Text>
           </View>
           <TouchableOpacity style={styles.button} onPress={handleEdit}>
@@ -243,7 +282,7 @@ const Goals: React.FC = () => {
               fontSize: 28,
             }}
           >
-            21.2
+            {bmi.toFixed(1)}
           </Text>
         </View>
       </View>
