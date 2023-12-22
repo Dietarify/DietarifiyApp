@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,15 +9,55 @@ import {
   TextInput,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import CaloriesBurnCard from "@/components/global/CaloriesBurnCard";
+import http from "@/utils/http";
+
+interface UserData {
+  currentWeight: number;
+  height: number;
+  weightTarget: number;
+  nickname: string;
+  birthDate: string;
+  gender: string;
+  dateTarget: string;
+  email: string;
+  name: string;
+  picture: string;
+}
 
 const GoalsEdit: React.FC = () => {
-  const [goalWeight, setGoalWeight] = useState("55"); // Set the initial value
+  const [user, setUser] = useState<UserData>({
+    currentWeight: 0,
+    height: 0,
+    weightTarget: 0,
+    nickname: "Nick Name",
+    birthDate: "00-00-0000",
+    gender: "Male",
+    dateTarget: "0-00-0000",
+    email: "aa@gmail.com",
+    name: "Name",
+    picture:
+      '"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEzWUGVq2Bs9eGsO1wkhrdop9RB-rWekOuQw&usqp=CAU"',
+  });
 
   const handleSave = () => {
     // Handle the logic to save the goal weight
     console.log("Goal Weight Saved:", goalWeight);
   };
+  useEffect(() => {
+    async function fetchGoals() {
+      try {
+        const response = await http.get("/profile");
+        // Replace with your API endpoint
+        // console.log("response", response.data.data);
+        setUser(response.data.data);
+      } catch (error) {
+        console.error("Error fetching goals data:", error);
+      }
+    }
+
+    fetchGoals();
+  }, []);
+  const [goalWeight, setGoalWeight] = useState(user.weightTarget.toFixed()); // Set the initial value
   return (
     <View style={styles.container}>
       <View style={styles.sectionContainer}>
@@ -88,7 +128,7 @@ const GoalsEdit: React.FC = () => {
         >
           <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
             <TextInput
-              value={goalWeight}
+              value={user.weightTarget.toFixed(2)}
               onChangeText={(text) => setGoalWeight(text)}
               keyboardType="numeric"
             />
@@ -152,7 +192,7 @@ const GoalsEdit: React.FC = () => {
                 fontSize: 12,
               }}
             >
-              65 kg
+              {user.currentWeight.toFixed(2)} kg
             </Text>
           </View>
           <View
@@ -178,7 +218,7 @@ const GoalsEdit: React.FC = () => {
                 fontSize: 12,
               }}
             >
-              55 kg
+              {user.weightTarget.toFixed(2)} kg
             </Text>
           </View>
         </View>

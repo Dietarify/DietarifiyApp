@@ -197,18 +197,17 @@ export default function HomePage() {
     caloriesNeeds: 0,
   });
 
-  useEffect(() => {
-    async function fetchCaloriesNeeded() {
-      try {
-        const response = await http.get("/history/calories?limit=1&page=1");
-        // Replace with your API endpoint
-        // console.log("response", response.data.data);
-        setCaloriesNeeds(response.data.data[0]);
-      } catch (error) {
-        console.error("Error fetching calories data:", error);
-      }
+  async function fetchCaloriesNeeded() {
+    try {
+      const response = await http.get("/history/calories?limit=1&page=1");
+      // Replace with your API endpoint
+      // console.log("response", response.data.data);
+      setCaloriesNeeds(response.data.data[0]);
+    } catch (error) {
+      console.error("Error fetching calories data:", error);
     }
-
+  }
+  useEffect(() => {
     fetchCaloriesNeeded();
   }, []);
 
@@ -224,6 +223,7 @@ export default function HomePage() {
   const dinnerStartTime = 18; // 6 PM
 
   const [currentTime, setCurrentTime] = useState(new Date().getHours());
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     // Update current time every minute
@@ -278,6 +278,7 @@ export default function HomePage() {
         if (response.data.status == "success") {
           Toast.show("Your diet has been recorded!");
           fetchHistoryData();
+          fetchCaloriesNeeded();
         }
         // console.log("Response:", response.data);
       });
@@ -365,7 +366,7 @@ export default function HomePage() {
             marginBottom: 10,
           }}
         >
-          Wednesday, 22nd November
+          {currentDate.toLocaleString()}
         </Text>
         <DietScheduleCard
           schedule="breakfast"
