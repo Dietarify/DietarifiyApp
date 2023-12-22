@@ -33,6 +33,25 @@ const Goals: React.FC = () => {
     // Add more data as needed
   ];
 
+  interface UserData {
+    currentWeight: number;
+    height: number;
+    weightTarget: number;
+    nickname: string;
+    birthDate: string;
+    gender: string;
+    dateTarget: string;
+    email: string;
+    name: string;
+    picture: string;
+  }
+
+  // const [user, setUser] = useState<UserData>({
+  //   currentWeight : 0,
+  //   height : 0,
+  //   weightTarget,
+  // })
+
   return (
     <View style={styles.container}>
       <View style={styles.sectionContainer}>

@@ -9,6 +9,7 @@ import {
   TouchableHighlight,
   FlatList,
   TextInput,
+  TouchableOpacity,
 } from "react-native";
 import useAuth from "@/hooks/auth";
 import http from "@/utils/http";
@@ -164,12 +165,11 @@ export default function HomePage() {
   const [breakfast, setBreakfast] = useState<MealData>();
   const [lunch, setLunch] = useState<MealData>();
   const [dinner, setDinner] = useState<MealData>();
-
   useEffect(() => {
     async function fetchFoodData() {
       try {
         const response = await http.get("/foods/recomendation"); // Replace with your API endpoint
-        console.log("food data", response.data.data);
+        // console.log("food data", response.data.data);
         setBreakfast(response.data.data.breakfast);
         setLunch(response.data.data.lunch);
         setDinner(response.data.data.dinner);
@@ -182,6 +182,109 @@ export default function HomePage() {
 
     fetchFoodData();
   }, []);
+
+  //calories count
+  interface Calories {
+    timestamp: string;
+    userId: string;
+    consumedCalories: number;
+    caloriesNeeds: number;
+  }
+  const [caloriesNeeds, setCaloriesNeeds] = useState<Calories>({
+    timestamp: "0",
+    userId: "0",
+    consumedCalories: 0,
+    caloriesNeeds: 0,
+  });
+
+  useEffect(() => {
+    async function fetchCaloriesNeeded() {
+      try {
+        const response = await http.get("/history/calories?limit=1&page=1");
+        // Replace with your API endpoint
+        // console.log("response", response.data.data);
+        setCaloriesNeeds(response.data.data[0]);
+      } catch (error) {
+        console.error("Error fetching calories data:", error);
+      }
+    }
+
+    fetchCaloriesNeeded();
+  }, []);
+
+  const caloriesNeedsFix = Number(caloriesNeeds.caloriesNeeds).toFixed(0);
+  const caloriesRemainingFix = Number(
+    caloriesNeeds.caloriesNeeds - caloriesNeeds.consumedCalories
+  ).toFixed(0);
+
+  //reminder
+
+  const breakfastStartTime = 7; // 7 AM
+  const lunchStartTime = 12; // 12 PM
+  const dinnerStartTime = 18; // 6 PM
+
+  const [currentTime, setCurrentTime] = useState(new Date().getHours());
+
+  useEffect(() => {
+    // Update current time every minute
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().getHours());
+    }, 60000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  let advice = "";
+  let schedule = "";
+
+  if (currentTime >= breakfastStartTime && currentTime < lunchStartTime) {
+    advice = "It's already Breakfast time!";
+    schedule = "breakfast";
+  } else if (currentTime >= lunchStartTime && currentTime < dinnerStartTime) {
+    advice = "It's already Lunchtime!";
+    schedule = "lunch";
+  } else if (
+    currentTime >= dinnerStartTime &&
+    currentTime < breakfastStartTime
+  ) {
+    advice = "It's already Dinner time!";
+    schedule = "dinner";
+  }
+
+  let foodId;
+
+  if (schedule === "breakfast") {
+    foodId = breakfast?.id;
+  } else if (schedule === "lunch") {
+    foodId = lunch?.id;
+  } else if (schedule === "dinner") {
+    foodId = dinner?.id;
+  } else {
+    // Default value or error handling if schedule doesn't match any known meal
+    foodId = 0;
+  }
+
+  const foodReccomendationData = {
+    foodId: foodId,
+    foodItemWeight: 300,
+  };
+
+  async function handleEatReccomendation() {
+    try {
+      console.log(foodEatenData);
+      await http.post("/diet", foodReccomendationData).then((response) => {
+        // Handle the success response
+        if (response.data.status == "success") {
+          Toast.show("Your diet has been recorded!");
+          fetchHistoryData();
+        }
+        // console.log("Response:", response.data);
+      });
+    } catch (error) {
+      console.error("error eat food : ", error);
+    }
+  }
 
   return (
     <ScrollView
@@ -218,7 +321,9 @@ export default function HomePage() {
               fontWeight: "bold",
             }}
           >
-            573
+            {/* {caloriesNeeds.caloriesNeeds - caloriesNeeds.consumedCalories}{" "}
+             */}
+            {parseInt(caloriesRemainingFix) < 0 ? "0" : caloriesRemainingFix}
           </Text>
           <Text
             style={{
@@ -232,7 +337,11 @@ export default function HomePage() {
             kcal needed
           </Text>
         </View>
-        <ProgressBarHrzntl percentage={80} />
+        <ProgressBarHrzntl
+          percentage={
+            (caloriesNeeds.consumedCalories / caloriesNeeds.caloriesNeeds) * 100
+          }
+        />
         <View style={{ width: "100%" }}>
           <Text
             style={{
@@ -241,7 +350,7 @@ export default function HomePage() {
               fontSize: 16,
             }}
           >
-            you've eaten <>4500</> kcal today
+            you've eaten {caloriesNeedsFix} kcal today
           </Text>
         </View>
       </View>
@@ -282,7 +391,7 @@ export default function HomePage() {
             marginBottom: 8,
           }}
         >
-          It's Already Breakfast Time!
+          {advice}
         </Text>
         <Text
           style={{
@@ -292,18 +401,29 @@ export default function HomePage() {
             marginBottom: 8,
           }}
         >
-          Have you eat Fried Rice?
+          Have you eaten{" "}
+          {schedule === "breakfast"
+            ? breakfast?.name
+            : schedule === "lunch"
+            ? lunch?.name
+            : dinner?.name}
+          ?
         </Text>
         <Text
           style={{
             fontFamily: "Open-Sans",
-            // fontWeight: "bold",
             alignSelf: "flex-start",
             fontSize: 10,
             marginBottom: 8,
           }}
         >
-          it will gain you 500 kcal
+          It will gain you{" "}
+          {schedule === "breakfast"
+            ? (breakfast?.caloriesPerHundredGram ?? 0) * 3
+            : schedule === "lunch"
+            ? (lunch?.caloriesPerHundredGram ?? 0) * 3
+            : (dinner?.caloriesPerHundredGram ?? 0) * 3}{" "}
+          kcal
         </Text>
         <View
           style={{
@@ -313,7 +433,10 @@ export default function HomePage() {
             justifyContent: "space-around",
           }}
         >
-          <View style={{ alignItems: "center" }}>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={() => handleEatReccomendation()}
+          >
             <Ionicons
               name="checkmark-circle"
               size={40}
@@ -323,8 +446,8 @@ export default function HomePage() {
               }}
             ></Ionicons>
             <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>Yes!</Text>
-          </View>
-          <View>
+          </TouchableOpacity>
+          {/* <TouchableOpacity onPress={() => setIsFocusDropDown(true)}>
             <Ionicons
               name="ios-search"
               size={40}
@@ -336,20 +459,7 @@ export default function HomePage() {
             <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>
               I ate another food
             </Text>
-          </View>
-          <View>
-            <MaterialIcons
-              name="cancel"
-              size={40}
-              color={"#FC3A78"}
-              style={{
-                textAlign: "center",
-              }}
-            ></MaterialIcons>
-            <Text style={{ fontFamily: "Open-Sans", fontSize: 10 }}>
-              I skipped this meal
-            </Text>
-          </View>
+          </TouchableOpacity> */}
         </View>
       </View>
 
