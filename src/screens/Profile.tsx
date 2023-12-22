@@ -8,7 +8,6 @@ import {
   ScrollView,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import FoodPreferenceCard from "@/components/global/FoodPreferenceCard";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import http from "@/utils/http";
 import Toast from "react-native-root-toast";
