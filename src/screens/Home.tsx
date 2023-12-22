@@ -42,8 +42,9 @@ export default function HomePage() {
         // Handle the success response
         if (response.data.status == "success") {
           Toast.show("Your diet has been recorded!");
+          fetchHistoryData();
         }
-        console.log("Response:", response.data);
+        // console.log("Response:", response.data);
       });
     } catch (error) {
       console.error("error eat food : ", error);
@@ -123,17 +124,16 @@ export default function HomePage() {
 
   const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
 
-  useEffect(() => {
-    async function fetchHistoryData() {
-      try {
-        const response = await http.get("/diet?limit=3&page=1"); // Replace with your API endpoint
-        setHistoryData(response.data.data);
-        console.log("history data", historyData);
-      } catch (error) {
-        console.error("Error fetching history data:", error);
-      }
+  async function fetchHistoryData() {
+    try {
+      const response = await http.get("/diet?limit=3&page=1"); // Replace with your API endpoint
+      setHistoryData(response.data.data);
+      // console.log("history data", historyData);
+    } catch (error) {
+      console.error("Error fetching history data:", error);
     }
-
+  }
+  useEffect(() => {
     fetchHistoryData();
   }, []);
 
@@ -152,6 +152,36 @@ export default function HomePage() {
       />
     );
   };
+
+  //Food Reccomendation
+  interface MealData {
+    id: number;
+    name: string;
+    category: string;
+    caloriesPerHundredGram: number;
+    energyPerHundredGram: number;
+  }
+  const [breakfast, setBreakfast] = useState<MealData>();
+  const [lunch, setLunch] = useState<MealData>();
+  const [dinner, setDinner] = useState<MealData>();
+
+  useEffect(() => {
+    async function fetchFoodData() {
+      try {
+        const response = await http.get("/foods/recomendation"); // Replace with your API endpoint
+        console.log("food data", response.data.data);
+        setBreakfast(response.data.data.breakfast);
+        setLunch(response.data.data.lunch);
+        setDinner(response.data.data.dinner);
+
+        // console.log("foodData", historyData);
+      } catch (error) {
+        console.error("Error fetching history data:", error);
+      }
+    }
+
+    fetchFoodData();
+  }, []);
 
   return (
     <ScrollView
@@ -230,15 +260,15 @@ export default function HomePage() {
         </Text>
         <DietScheduleCard
           schedule="breakfast"
-          foodItem="Lontong Kari"
+          foodItem={breakfast?.name}
         ></DietScheduleCard>
         <DietScheduleCard
           schedule="lunch"
-          foodItem="Baso Sapi"
+          foodItem={lunch?.name}
         ></DietScheduleCard>
         <DietScheduleCard
           schedule="dinner"
-          foodItem="Sate Ayam"
+          foodItem={dinner?.name}
         ></DietScheduleCard>
       </View>
 

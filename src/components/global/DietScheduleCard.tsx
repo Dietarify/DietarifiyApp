@@ -4,7 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 interface CardProps {
   schedule: string;
-  foodItem: string;
+  foodItem?: string;
 }
 
 const DietScheduleCard: React.FC<CardProps> = ({ schedule, foodItem }) => {
